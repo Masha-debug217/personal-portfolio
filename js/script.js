@@ -1,12 +1,3 @@
-/*
-  Personal Portfolio - Winnie Masha
-  Main JavaScript file with:
-  - Section loading
-  - Pink butterfly cursor with shimmering particles
-  - Scroll reveal animations
-  - Fixed navbar support
-*/
-
 // ========== CONFIGURATION ==========
 const defaultConfig = {
   background_color: "#0B0B0F",
@@ -16,11 +7,11 @@ const defaultConfig = {
   pink_color: "#F472B6",
   font_family: "Poppins",
   font_size: 16,
-  logo_text: "Winnie.",
-  hero_name: "Winnie Masha",
+  logo_text: "",  // Empty since you removed the logo
+  hero_name: "Winnie Macharia",  // Changed from Winnie Masha
   hero_title: "Software Developer & AI Enthusiast",
-  hero_description: "I am passionate about building modern web applications, creating intuitive UI/UX designs, and exploring AI systems. I enjoy turning ideas into functional and visually appealing digital experiences.",
-  footer_text: "Built with passion ✨ by Winnie — Code. Create. Evolve."
+  hero_description: "I build web experiences that work. Clean code, thoughtful design, and a focus on what actually matters to users.",
+  footer_text: ""  // Empty since footer is now customized
 };
 
 // ========== LOAD ALL SECTIONS ==========

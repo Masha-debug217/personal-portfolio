@@ -28,16 +28,22 @@ body {
 }
 
 /* ========== FIXED NAVBAR - NEVER SCROLLS ========== */
+/* Updated Fixed Navbar - NO black background box */
 .fixed-navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 9999;
-  background: rgba(11, 11, 15, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: transparent;  /* Changed from rgba(11,11,15,0.95) */
+  backdrop-filter: none;     /* Removed blur */
+  -webkit-backdrop-filter: none;
+  border-bottom: none;       /* Removed border */
+}
+
+/* But keep the glass effect for the nav content itself */
+.fixed-navbar nav .flex {
+  background: transparent;
 }
 
 /* Add padding to body to prevent content hiding behind fixed navbar */
