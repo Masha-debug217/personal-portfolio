@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Winnie Masha | Developer Portfolio</title>
+  
+  <!-- External CSS & Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- FIXED NAVBAR - outside scroll container, NEVER moves -->
+  <div id="navbar-container" class="fixed-navbar"></div>
+  
+  <!-- SCROLLABLE CONTENT - has padding-top to clear the fixed navbar -->
+  <div id="portfolio-shell" class="portfolio-shell">
+    <main class="relative z-10">
+      <div id="hero-container"></div>
+      <div id="about-container"></div>
+      <div id="services-container"></div>
+      <div id="skills-container"></div>
+      <div id="projects-container"></div>
+      <div id="contact-container"></div>
+    </main>
+    
+    <div id="footer-container"></div>
+  </div>
+  
+  <!-- Custom JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+</html>
