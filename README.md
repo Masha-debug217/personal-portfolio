@@ -1,7 +1,7 @@
 # Winnie Masha - Personal Portfolio
 
 ## Live Site
-[View Portfolio](jade-kitten-7f23ee.netlify.app)
+[View Portfolio](https://jade-kitten-7f23ee.netlify.app/)
 
 ## About This Project
 This is my personal developer portfolio built as part of Project S-001. It showcases my skills, projects, and services as a Computer Science student and aspiring software developer.
