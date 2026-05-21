@@ -7,11 +7,61 @@ const defaultConfig = {
   pink_color: "#F472B6",
   font_family: "Poppins",
   font_size: 16,
-  logo_text: "",  // Empty since you removed the logo
-  hero_name: "Winnie Macharia",  // Changed from Winnie Masha
+  hero_name: "Winnie Macharia",
   hero_title: "Software Developer & AI Enthusiast",
-  hero_description: "I build web experiences that work. Clean code, thoughtful design, and a focus on what actually matters to users.",
-  footer_text: ""  // Empty since footer is now customized
+  hero_description: "I build web experiences that work. Computer Science student who actually ships things – from full-stack trading platforms to mobile health apps. I focus on clean code, thoughtful UX, and solving real problems."
+};
+
+// ========== PROJECT DATA FOR MODALS ==========
+const projectData = {
+   
+  'modal-tradelink': {
+    title: 'TradeLink',
+    period: '2026',
+    description: '',
+    image: 'assets/images/trade.png',
+    features: [
+      'Product browsing and search',
+      'Shopping cart with persistent storage',
+      'Secure checkout flow',
+      'Order history for users'
+    ],
+    challenges: [
+      'Coordinating with backend team on API contracts',
+      'Managing state between cart and checkout',
+      'Real-time inventory updates'
+    ],
+    accomplishments: [
+      'Successfully integrated with team\'s REST API',
+      'Reduced cart abandonment with saved cart feature',
+      'Implemented responsive design for mobile shoppers'
+    ],
+    techStack: ['React.js', 'Django', 'MongoDB', 'CSS'],
+  },
+  
+  'modal-foodflow': {
+    title: 'FoodFlow',
+    period: '2026',
+    description: '',
+    image: 'assets/images/food.png',
+    features: [
+      'Real-time inventory tracking',
+      'Low stock alerts',
+      'Supplier management',
+      'Order processing'
+    ],
+    challenges: [
+      'Designing database schema for inventory tracking',
+      'Implementing real-time updates',
+      'User role permissions'
+    ],
+    accomplishments: [
+      'Built fully functional system that is actively used',
+      'Trained staff on how to use the system',
+      'Reduced manual inventory errors by 80%'
+    ],
+    techStack: ['Java', 'MySQL', 'CSS', 'HTML', 'Javascript'],
+  }
 };
 
 // ========== LOAD ALL SECTIONS ==========
@@ -19,7 +69,6 @@ async function loadAllSections() {
   const sections = [
     { id: 'navbar-container', file: 'navbar' },
     { id: 'hero-container', file: 'hero' },
-    { id: 'about-container', file: 'about' },
     { id: 'services-container', file: 'services' },
     { id: 'skills-container', file: 'skills' },
     { id: 'projects-container', file: 'projects' },
@@ -44,8 +93,184 @@ async function loadAllSections() {
     }
   }
   
-  // After all sections loaded, initialize everything
   setTimeout(initializeAfterLoad, 100);
+}
+
+// ========== MODAL SYSTEM ==========
+function initModalSystem() {
+  const modal = document.getElementById('modal-overlay');
+  const closeBtn = document.getElementById('modal-close');
+  
+  if (!modal) return;
+  
+  // Close modal function
+  window.closeModal = function() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  };
+  
+  // Close on button click
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeModal);
+  }
+  
+  // Close on outside click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+  
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('flex')) {
+      closeModal();
+    }
+  });
+}
+
+function openModal(modalId) {
+  const data = projectData[modalId];
+  if (!data) {
+    console.warn(`No data found for modal: ${modalId}`);
+    return;
+  }
+  
+  const modal = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  
+  if (!modal || !content) return;
+  
+  content.innerHTML = `
+    <div class="flex justify-between items-start mb-4">
+      <h2 class="text-3xl font-bold gradient-text">${escapeHtml(data.title)}</h2>
+    </div>
+    <p class="text-sm text-zinc-500 mb-4">${escapeHtml(data.period || 'Project')}</p>
+    
+    ${data.image ? `<img src="${data.image}" alt="${data.title}" class="w-full rounded-xl mb-6" onerror="this.style.display='none'">` : ''}
+    
+    <p class="text-zinc-300 mb-6 leading-relaxed">${escapeHtml(data.description)}</p>
+    
+    ${data.features ? `
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Features</h3>
+        <ul class="list-disc list-inside text-zinc-400 space-y-1">
+          ${data.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
+    
+    ${data.challenges ? `
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Challenges</h3>
+        <ul class="list-disc list-inside text-zinc-400 space-y-1">
+          ${data.challenges.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
+    
+    ${data.accomplishments ? `
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Accomplishments</h3>
+        <ul class="list-disc list-inside text-zinc-400 space-y-1">
+          ${data.accomplishments.map(a => `<li>${escapeHtml(a)}</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
+    
+    ${data.techStack ? `
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Tech Stack</h3>
+        <div class="flex flex-wrap gap-2">
+          ${data.techStack.map(tech => `<span class="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">${escapeHtml(tech)}</span>`).join('')}
+        </div>
+      </div>
+    ` : ''}
+    
+    <div class="flex gap-4 mt-6 flex-wrap">
+      ${data.github ? `<a href="${data.github}" target="_blank" class="primary-button px-5 py-2 rounded-full text-sm inline-flex items-center gap-2">GitHub <i data-lucide="external-link" class="h-3 w-3"></i></a>` : ''}
+      ${data.liveDemo ? `<a href="${data.liveDemo}" target="_blank" class="secondary-button px-5 py-2 rounded-full text-sm inline-flex items-center gap-2">Live Demo <i data-lucide="external-link" class="h-3 w-3"></i></a>` : ''}
+      ${data.youtube ? `<a href="${data.youtube}" target="_blank" class="secondary-button px-5 py-2 rounded-full text-sm inline-flex items-center gap-2">YouTube <i data-lucide="external-link" class="h-3 w-3"></i></a>` : ''}
+    </div>
+  `;
+  
+  // Re-initialize Lucide icons in modal
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+  
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+// Helper function to prevent XSS
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function attachModalTriggers() {
+  document.querySelectorAll('[data-modal]').forEach(card => {
+    if (card.dataset.modalReady === 'true') return;
+    card.dataset.modalReady = 'true';
+
+    card.addEventListener('click', (e) => {
+      // Don't trigger if clicking on a link inside the card
+      if (e.target.tagName === 'A' || e.target.closest('a')) return;
+
+      const modalId = card.getAttribute('data-modal');
+      openModal(modalId);
+    });
+  });
+}
+
+// ========== THEME TOGGLE (LIGHT/DARK MODE) ==========
+function initThemeToggle() {
+  const themeToggle = document.getElementById('theme-toggle');
+  if (!themeToggle) return;
+  
+  // Check for saved theme preference
+  const savedTheme = localStorage.getItem('theme');
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  
+  if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+    document.body.classList.add('light-mode');
+    updateThemeIcon('light');
+  } else {
+    document.body.classList.remove('light-mode');
+    updateThemeIcon('dark');
+  }
+  
+  themeToggle.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    updateThemeIcon(isLight ? 'light' : 'dark');
+    
+    // Recreate Lucide icons to update icon if needed
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  });
+}
+
+function updateThemeIcon(theme) {
+  const themeToggle = document.getElementById('theme-toggle');
+  if (!themeToggle) return;
+  
+  if (theme === 'light') {
+    themeToggle.innerHTML = '<i data-lucide="sun" class="h-5 w-5"></i>';
+  } else {
+    themeToggle.innerHTML = '<i data-lucide="moon" class="h-5 w-5"></i>';
+  }
+  
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
 }
 
 // ========== INITIALIZE AFTER SECTIONS LOAD ==========
@@ -56,7 +281,6 @@ function initializeAfterLoad() {
   const mobileLinks = document.querySelectorAll('.mobile-link');
   
   if (menuToggle && mobileMenu) {
-    // Remove any existing listeners to avoid duplicates
     const newMenuToggle = menuToggle.cloneNode(true);
     menuToggle.parentNode.replaceChild(newMenuToggle, menuToggle);
     
@@ -96,10 +320,10 @@ function initializeAfterLoad() {
   
   revealItems.forEach((item) => revealObserver.observe(item));
   
-  // Active link highlighting on scroll (accounting for fixed navbar)
+  // Active link highlighting
   const sections = document.querySelectorAll('main section[id]');
   const allNavLinks = document.querySelectorAll('.nav-link');
-  const navbarHeight = 85; // pixels of fixed navbar
+  const navbarHeight = 85;
   
   function updateActiveLink() {
     if (!sections.length || !allNavLinks.length) return;
@@ -129,18 +353,16 @@ function initializeAfterLoad() {
   window.addEventListener('scroll', updateActiveLink);
   updateActiveLink();
   
-  // Fix anchor links to account for fixed navbar
+  // Smooth anchor links with navbar offset
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute('href');
-      if (targetId === '#') return;
+      const href = this.getAttribute('href');
+      if (href === '#') return;
       
-      const targetElement = document.querySelector(targetId);
+      const targetElement = document.querySelector(href);
       if (targetElement) {
-        const navbarHeight = 85;
+        e.preventDefault();
         const targetPosition = targetElement.offsetTop - navbarHeight;
-        
         window.scrollTo({
           top: targetPosition,
           behavior: 'smooth'
@@ -149,8 +371,8 @@ function initializeAfterLoad() {
     });
   });
   
-  // Apply configuration
-  applyConfig(defaultConfig);
+  // Attach modal triggers to project cards
+  attachModalTriggers();
   
   // Initialize Lucide icons
   if (typeof lucide !== 'undefined') {
@@ -164,39 +386,10 @@ function initializeAfterLoad() {
   }
   
   // Console greeting
-  console.log('🦋 Welcome to Winnie Masha\'s portfolio!');
+  console.log('🦋 Welcome to Winnie Macharia\'s portfolio!');
   console.log('✨ Pink butterfly with shimmering particles active');
-  console.log('📌 Fixed navbar - never scrolls');
+  console.log('🎨 Light/Dark mode ready');
   console.log('📅 Loaded on:', new Date().toLocaleString());
-}
-
-// ========== APPLY DYNAMIC CONFIGURATION ==========
-function applyConfig(config) {
-  const backgroundColor = config.background_color || defaultConfig.background_color;
-  const cardColor = config.card_color || defaultConfig.card_color;
-  const purpleColor = config.purple_color || defaultConfig.purple_color;
-  const pinkColor = config.pink_color || defaultConfig.pink_color;
-  
-  document.documentElement.style.setProperty('--background-color', backgroundColor);
-  document.documentElement.style.setProperty('--card-color', cardColor);
-  document.documentElement.style.setProperty('--text-color', config.text_color || defaultConfig.text_color);
-  document.documentElement.style.setProperty('--purple-color', purpleColor);
-  document.documentElement.style.setProperty('--pink-color', pinkColor);
-  
-  // Update text content when elements exist
-  setTimeout(() => {
-    const logoText = document.getElementById('logoText');
-    const heroName = document.getElementById('heroName');
-    const heroTitle = document.getElementById('heroTitle');
-    const heroDescription = document.getElementById('heroDescription');
-    const footerText = document.getElementById('footerText');
-    
-    if (logoText) logoText.textContent = config.logo_text || defaultConfig.logo_text;
-    if (heroName) heroName.textContent = config.hero_name || defaultConfig.hero_name;
-    if (heroTitle) heroTitle.textContent = config.hero_title || defaultConfig.hero_title;
-    if (heroDescription) heroDescription.textContent = config.hero_description || defaultConfig.hero_description;
-    if (footerText) footerText.textContent = config.footer_text || defaultConfig.footer_text;
-  }, 200);
 }
 
 // ========== PINK BUTTERFLY WITH SHIMMERING PARTICLES ==========
@@ -204,7 +397,6 @@ function initButterflyEffect() {
   // Only run on devices with a mouse
   if (!window.matchMedia('(pointer: fine)').matches) return;
   
-  // Create butterfly element with custom pink SVG
   const butterfly = document.createElement('div');
   butterfly.className = 'cursor-butterfly';
   butterfly.innerHTML = `
@@ -314,7 +506,6 @@ function initButterflyEffect() {
   
   animateButterfly();
   
-  // Gentle floating particles when mouse is still
   setInterval(() => {
     if (Math.abs(mouseX - butterflyX) < 15 && Math.abs(mouseY - butterflyY) < 15 && mouseX > 0) {
       createParticle(butterflyX + (Math.random() - 0.5) * 25, butterflyY + (Math.random() - 0.5) * 25);
@@ -323,8 +514,111 @@ function initButterflyEffect() {
 }
 
 // ========== START THE APP ==========
-// First load all sections
+// Initialize modal system first
+initModalSystem();
+
+// Load all sections
 loadAllSections();
 
-// Then initialize butterfly effect (it doesn't depend on sections)
+// Initialize theme toggle
+initThemeToggle();
+
+// Initialize butterfly effect
 initButterflyEffect();
+
+// ========== FLOATING AI CHAT ==========
+
+async function askGemini(question) {
+  try {
+    const response = await fetch('/.netlify/functions/gemini-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok && data.answer) {
+      return data.answer;
+    } else {
+      return data.error || "Sorry, I had trouble answering that. Please try again!";
+    }
+  } catch (error) {
+    console.error('Chat API Error:', error);
+    return "Connection issue. Please try again in a moment.";
+  }
+}
+
+// Initialize Floating Chat
+function initFloatingChat() {
+  const chatButton = document.getElementById('chat-button');
+  const chatWindow = document.getElementById('chat-window');
+  const chatClose = document.getElementById('chat-close');
+  const chatInput = document.getElementById('chat-window-input');
+  const chatSend = document.getElementById('chat-window-send');
+  const chatMessages = document.getElementById('chat-window-messages');
+  
+  if (!chatButton || !chatWindow) return;
+  
+  // Open chat
+  chatButton.addEventListener('click', () => {
+    chatWindow.classList.toggle('hidden');
+    if (!chatWindow.classList.contains('hidden')) {
+      chatInput?.focus();
+    }
+  });
+  
+  // Close chat
+  chatClose?.addEventListener('click', () => {
+    chatWindow.classList.add('hidden');
+  });
+  
+  function addMessage(text, isUser) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+    messageDiv.innerHTML = `
+      <div class="${isUser ? 'bg-gradient-to-r from-[#A855F7] to-[#F472B6] text-white' : 'glass text-white'} rounded-2xl ${isUser ? 'rounded-br-none' : 'rounded-bl-none'} px-4 py-2 max-w-[85%]">
+        <p class="text-sm">${escapeHtml(text)}</p>
+      </div>
+    `;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+  
+  async function sendMessage() {
+    const question = chatInput.value.trim();
+    if (!question) return;
+    
+    addMessage(question, true);
+    chatInput.value = '';
+    
+    // Typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'flex justify-start';
+    typingDiv.id = 'chat-typing';
+    typingDiv.innerHTML = `
+      <div class="glass rounded-2xl rounded-bl-none px-4 py-2">
+        <p class="text-sm text-zinc-400">Winnie is typing<span class="animate-pulse">...</span></p>
+      </div>
+    `;
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    const answer = await askGemini(question);
+    
+    document.getElementById('chat-typing')?.remove();
+    addMessage(answer, false);
+  }
+  
+  chatSend?.addEventListener('click', sendMessage);
+  chatInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+}
+
+// Initialize chat when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initFloatingChat);
+} else {
+  setTimeout(initFloatingChat, 500);
+}
