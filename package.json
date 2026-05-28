@@ -1,0 +1,25 @@
+{
+  "name": "personal-portfolio1",
+  "version": "1.0.0",
+  "description": "[View Portfolio](https://your-netlify-url.netlify.app) *(update this after deployment)*",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Masha-debug217/personal-portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Masha-debug217/personal-portfolio/issues"
+  },
+  "homepage": "https://github.com/Masha-debug217/personal-portfolio#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0"
+  }
+}

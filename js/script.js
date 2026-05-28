@@ -12,9 +12,243 @@ const defaultConfig = {
   hero_description: "I build web experiences that work. Computer Science student who actually ships things – from full-stack trading platforms to mobile health apps. I focus on clean code, thoughtful UX, and solving real problems."
 };
 
+// ========== DYNAMIC PROJECTS FROM LOCALSTORAGE ==========
+function getProjectsFromStorage() {
+    const saved = localStorage.getItem('portfolio_projects');
+    if (saved) {
+        return JSON.parse(saved);
+    }
+    
+    const defaultProjects = [
+        {
+            id: "project_tradelink",
+            title: "TradeLink",
+            description: "E-commerce platform with checkout flow. Acted as the dedicated Full-Stack Payment Engineer for a group project, independently building the frontend checkout interface and backend architecture to integrate the PayHero payment gateway.",
+            imageUrl: "assets/images/trade.png",
+            projectLink: "#",
+            githubLink: "#",
+            technologies: ["React", "Django", "MongoDB", "CSS"],
+            dateAdded: "2024-01-15",
+            clickCount: 0,
+            modalId: "modal-tradelink"
+        },
+        {
+            id: "project_lipia",
+            title: "Lipia",
+            description: "Fintech UI concept bridging Kenyan payments with global e-commerce.",
+            imageUrl: "",
+            projectLink: "",
+            githubLink: "",
+            technologies: ["Figma", "Fintech"],
+            dateAdded: "2024-01-20",
+            clickCount: 0,
+            modalId: null,
+            figmaLink: "https://www.figma.com/design/ffqvZtYYejDiQLdCYrtikA/Lipia"
+        },
+        {
+            id: "project_shining_steps",
+            title: "Shining Steps",
+            description: "Website design for an autism support organization. Focus on accessibility.",
+            imageUrl: "",
+            projectLink: "",
+            githubLink: "",
+            technologies: ["Figma", "Accessibility"],
+            dateAdded: "2024-02-01",
+            clickCount: 0,
+            modalId: null,
+            figmaLink: "https://www.figma.com/design/qo51cZ1gC69Y1dEeTuXxni/Shining-Steps"
+        },
+        {
+            id: "project_clicket",
+            title: "Clicket",
+            description: "Mobile event ticketing UI with smooth booking flow.",
+            imageUrl: "",
+            projectLink: "",
+            githubLink: "",
+            technologies: ["Figma", "Mobile UI"],
+            dateAdded: "2024-02-05",
+            clickCount: 0,
+            modalId: null,
+            figmaLink: "https://www.figma.com/design/nSfSQgLjIMTtx79mmpTY2Y/Clicket"
+        },
+        {
+            id: "project_cervibloom",
+            title: "CerviBloom",
+            description: "Mobile app interface for cervical cancer awareness and prevention.",
+            imageUrl: "",
+            projectLink: "",
+            githubLink: "",
+            technologies: ["Figma", "Health Tech"],
+            dateAdded: "2024-02-10",
+            clickCount: 0,
+            modalId: null,
+            figmaLink: "https://www.figma.com/design/C3xLEEAR7hZHiZrGyS9Z2u/CerviBloom"
+        },
+        {
+            id: "project_foodflow",
+            title: "FoodFlow",
+            description: "Inventory management system for a catering department. Functional and in use.",
+            imageUrl: "assets/images/food.png",
+            projectLink: "#",
+            githubLink: "#",
+            technologies: ["Java", "HTML", "JavaScript", "CSS"],
+            dateAdded: "2024-01-25",
+            clickCount: 0,
+            modalId: "modal-foodflow"
+        }
+    ];
+    
+    localStorage.setItem('portfolio_projects', JSON.stringify(defaultProjects));
+    return defaultProjects;
+}
+
+function getProjectById(projectId) {
+    const projects = getProjectsFromStorage();
+    const storedId = projectId.replace('modal-', 'project_');
+    return projects.find(p => p.id === storedId);
+}
+
+function getLocalDateKey(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getProjectClickStats() {
+    const saved = localStorage.getItem('portfolio_project_clicks');
+    if (saved) {
+        return JSON.parse(saved);
+    }
+    
+    const defaultStats = {};
+    localStorage.setItem('portfolio_project_clicks', JSON.stringify(defaultStats));
+    return defaultStats;
+}
+
+function incrementProjectClick(projectId, clickType = 'modal') {
+    const projects = getProjectsFromStorage();
+    const project = projects.find(p => p.id === projectId);
+    
+    if (!project) {
+        console.warn(`No project found for click tracking: ${projectId}`);
+        return;
+    }
+    
+    project.clickCount = (project.clickCount || 0) + 1;
+    localStorage.setItem('portfolio_projects', JSON.stringify(projects));
+
+    const stats = getProjectClickStats();
+    const today = getLocalDateKey();
+    const safeClickType = clickType === 'figma' ? 'figma' : 'modal';
+    
+    if (!stats[today]) {
+        stats[today] = {};
+    }
+    
+    if (!stats[today][projectId]) {
+        stats[today][projectId] = { modal: 0, figma: 0 };
+    }
+    
+    stats[today][projectId][safeClickType] = (stats[today][projectId][safeClickType] || 0) + 1;
+    localStorage.setItem('portfolio_project_clicks', JSON.stringify(stats));
+}
+
+// ========== GENERATE PROJECT CARDS DYNAMICALLY ==========
+function renderDynamicProjects() {
+    const projectsContainer = document.getElementById('projects-container');
+    if (!projectsContainer) return;
+    
+    const projects = getProjectsFromStorage();
+    
+    const projectsHTML = `
+        <section id="projects" class="mx-auto w-full max-w-7xl px-5 py-20 sm:px-6 lg:px-8">
+            <div class="reveal mb-12 text-center">
+                <p class="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-[#F472B6]">Projects</p>
+                <h2 class="text-4xl font-bold tracking-tight sm:text-5xl">What I've built</h2>
+                <p class="mx-auto mt-5 max-w-2xl leading-8 text-zinc-400">Full-stack applications, design concepts, and features I'm proud of.</p>
+            </div>
+            
+            <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                ${projects.map(project => generateProjectCard(project)).join('')}
+            </div>
+        </section>
+    `;
+    
+    projectsContainer.innerHTML = projectsHTML;
+    
+    setTimeout(() => {
+        attachModalTriggers();
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }, 50);
+}
+
+function generateProjectCard(project) {
+    const hasModal = project.modalId && (project.id === "project_tradelink" || project.id === "project_foodflow");
+    const hasFigma = project.figmaLink;
+    
+    let actionHTML = '';
+    let cardClass = 'reveal project-card glass rounded-[2rem] p-7 transition-all';
+    
+    if (hasModal) {
+        cardClass += ' cursor-pointer';
+        actionHTML = `<div class="mt-5"><span class="text-sm text-[#F472B6]">Click to learn more →</span></div>`;
+    } else if (hasFigma) {
+        actionHTML = `
+            <div class="mt-5">
+                <a href="${project.figmaLink}" target="_blank" class="primary-button inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-all">
+                    View in Figma <i data-lucide="external-link" class="h-3 w-3"></i>
+                </a>
+            </div>
+        `;
+    }
+    
+    if (hasModal) {
+        actionHTML = `
+            <div class="mt-5">
+                <button type="button" onclick="event.stopPropagation(); openModal('${project.modalId}')" class="text-sm text-[#F472B6]">
+                    Click to learn more →
+                </button>
+            </div>
+        `;
+    } else if (hasFigma) {
+        actionHTML = `
+            <div class="mt-5">
+                <a href="${escapeHtml(project.figmaLink)}" target="_blank" onclick="incrementProjectClick('${project.id}', 'figma')" class="primary-button inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-all">
+                    View in Figma <i data-lucide="external-link" class="h-3 w-3"></i>
+                </a>
+            </div>
+        `;
+    }
+    
+    let iconHtml = '<i data-lucide="code-2" class="h-6 w-6 text-[#F472B6]"></i>';
+    if (project.title === "TradeLink") iconHtml = '<i data-lucide="shopping-bag" class="h-6 w-6 text-[#F472B6]"></i>';
+    if (project.title === "Lipia") iconHtml = '<i data-lucide="credit-card" class="h-6 w-6 text-[#F472B6]"></i>';
+    if (project.title === "Shining Steps") iconHtml = '<i data-lucide="heart-handshake" class="h-6 w-6 text-[#F472B6]"></i>';
+    if (project.title === "Clicket") iconHtml = '<i data-lucide="ticket" class="h-6 w-6 text-[#F472B6]"></i>';
+    if (project.title === "CerviBloom") iconHtml = '<i data-lucide="flower-2" class="h-6 w-6 text-[#F472B6]"></i>';
+    if (project.title === "FoodFlow") iconHtml = '<i data-lucide="boxes" class="h-6 w-6 text-[#F472B6]"></i>';
+    
+    return `
+        <article class="${cardClass}" ${hasModal ? `data-modal="${project.modalId}"` : ''}>
+            <div class="mb-3 flex items-center justify-between">
+                <h3 class="text-2xl font-bold">${escapeHtml(project.title)}</h3>
+                ${iconHtml}
+            </div>
+            <p class="text-sm text-zinc-500 mb-3">${project.dateAdded}</p>
+            <p class="leading-7 text-zinc-400">${escapeHtml(project.description.substring(0, 120))}${project.description.length > 120 ? '...' : ''}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+                ${project.technologies.map(tech => `<span class="rounded-full bg-[#A855F7]/15 px-3 py-1 text-xs">${escapeHtml(tech)}</span>`).join('')}
+            </div>
+            ${actionHTML}
+        </article>
+    `;
+}
+
 // ========== PROJECT DATA FOR MODALS ==========
 const projectData = {
-   
   'modal-tradelink': {
     title: 'TradeLink',
     period: '2026',
@@ -38,7 +272,6 @@ const projectData = {
     ],
     techStack: ['React.js', 'Django', 'MongoDB', 'CSS'],
   },
-  
   'modal-foodflow': {
     title: 'FoodFlow',
     period: '2026',
@@ -66,34 +299,47 @@ const projectData = {
 
 // ========== LOAD ALL SECTIONS ==========
 async function loadAllSections() {
-  const sections = [
-    { id: 'navbar-container', file: 'navbar' },
-    { id: 'hero-container', file: 'hero' },
-    { id: 'services-container', file: 'services' },
-    { id: 'skills-container', file: 'skills' },
-    { id: 'projects-container', file: 'projects' },
-    { id: 'contact-container', file: 'contact' },
-    { id: 'footer-container', file: 'footer' }
-  ];
-  
-  for (const section of sections) {
-    try {
-      const response = await fetch(`sections/${section.file}.html`);
-      if (response.ok) {
-        const html = await response.text();
-        const container = document.getElementById(section.id);
-        if (container) {
-          container.innerHTML = html;
+    const sections = [
+        { id: 'navbar-container', file: 'navbar' },
+        { id: 'hero-container', file: 'hero' },
+        { id: 'services-container', file: 'services' },
+        { id: 'skills-container', file: 'skills' },
+        { id: 'contact-container', file: 'contact' },
+        { id: 'footer-container', file: 'footer' }
+    ];
+    
+    for (const section of sections) {
+        try {
+            const response = await fetch(`sections/${section.file}.html`);
+            if (response.ok) {
+                const html = await response.text();
+                const container = document.getElementById(section.id);
+                if (container) {
+                    container.innerHTML = html;
+
+                    if (section.file === 'services') {
+                        loadServicesFromStorage();
+                    }
+
+                    if (section.file === 'skills') {
+                        loadSkillsFromStorage();
+                    }
+
+                    if (section.file === 'contact') {
+                        loadContactFromStorage();
+                    }
+                }
+            } else {
+                console.warn(`Could not load ${section.file}`);
+            }
+        } catch (error) {
+            console.error(`Error loading ${section.file}:`, error);
         }
-      } else {
-        console.warn(`Could not load ${section.file}`);
-      }
-    } catch (error) {
-      console.error(`Error loading ${section.file}:`, error);
     }
-  }
-  
-  setTimeout(initializeAfterLoad, 100);
+    
+    renderDynamicProjects();
+    
+    setTimeout(initializeAfterLoad, 100);
 }
 
 // ========== MODAL SYSTEM ==========
@@ -103,25 +349,21 @@ function initModalSystem() {
   
   if (!modal) return;
   
-  // Close modal function
   window.closeModal = function() {
     modal.classList.add('hidden');
     modal.classList.remove('flex');
   };
   
-  // Close on button click
   if (closeBtn) {
     closeBtn.addEventListener('click', closeModal);
   }
   
-  // Close on outside click
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       closeModal();
     }
   });
   
-  // Close on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal.classList.contains('flex')) {
       closeModal();
@@ -130,77 +372,49 @@ function initModalSystem() {
 }
 
 function openModal(modalId) {
-  const data = projectData[modalId];
-  if (!data) {
-    console.warn(`No data found for modal: ${modalId}`);
-    return;
-  }
-  
-  const modal = document.getElementById('modal-overlay');
-  const content = document.getElementById('modal-content');
-  
-  if (!modal || !content) return;
-  
-  content.innerHTML = `
-    <div class="flex justify-between items-start mb-4">
-      <h2 class="text-3xl font-bold gradient-text">${escapeHtml(data.title)}</h2>
-    </div>
-    <p class="text-sm text-zinc-500 mb-4">${escapeHtml(data.period || 'Project')}</p>
+    const project = getProjectById(modalId);
     
-    ${data.image ? `<img src="${data.image}" alt="${data.title}" class="w-full rounded-xl mb-6" onerror="this.style.display='none'">` : ''}
+    if (!project) {
+        console.warn(`No project found for modal: ${modalId}`);
+        return;
+    }
+
+    incrementProjectClick(project.id, 'modal');
     
-    <p class="text-zinc-300 mb-6 leading-relaxed">${escapeHtml(data.description)}</p>
+    const modal = document.getElementById('modal-overlay');
+    const content = document.getElementById('modal-content');
     
-    ${data.features ? `
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Features</h3>
-        <ul class="list-disc list-inside text-zinc-400 space-y-1">
-          ${data.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')}
-        </ul>
-      </div>
-    ` : ''}
+    if (!modal || !content) return;
     
-    ${data.challenges ? `
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Challenges</h3>
-        <ul class="list-disc list-inside text-zinc-400 space-y-1">
-          ${data.challenges.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
-        </ul>
-      </div>
-    ` : ''}
-    
-    ${data.accomplishments ? `
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Accomplishments</h3>
-        <ul class="list-disc list-inside text-zinc-400 space-y-1">
-          ${data.accomplishments.map(a => `<li>${escapeHtml(a)}</li>`).join('')}
-        </ul>
-      </div>
-    ` : ''}
-    
-    ${data.techStack ? `
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Tech Stack</h3>
-        <div class="flex flex-wrap gap-2">
-          ${data.techStack.map(tech => `<span class="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">${escapeHtml(tech)}</span>`).join('')}
+    content.innerHTML = `
+        <div class="flex justify-between items-start mb-4">
+            <h2 class="text-3xl font-bold gradient-text">${escapeHtml(project.title)}</h2>
         </div>
-      </div>
-    ` : ''}
+        <p class="text-sm text-zinc-500 mb-4">${escapeHtml(project.dateAdded)}</p>
+        
+        ${project.imageUrl ? `<img src="${project.imageUrl}" alt="${project.title}" class="w-full rounded-xl mb-6" onerror="this.style.display='none'">` : ''}
+        
+        <p class="text-zinc-300 mb-6 leading-relaxed">${escapeHtml(project.description)}</p>
+        
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold text-[#F472B6] mb-3">Tech Stack</h3>
+            <div class="flex flex-wrap gap-2">
+                ${project.technologies.map(tech => `<span class="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">${escapeHtml(tech)}</span>`).join('')}
+            </div>
+        </div>
+        
+        <div class="flex gap-4 mt-6 flex-wrap">
+            ${project.githubLink && project.githubLink !== '#' ? `<a href="${project.githubLink}" target="_blank" class="primary-button px-5 py-2 rounded-full text-sm inline-flex items-center gap-2">GitHub <i data-lucide="external-link" class="h-3 w-3"></i></a>` : ''}
+            ${project.projectLink && project.projectLink !== '#' ? `<a href="${project.projectLink}" target="_blank" class="secondary-button px-5 py-2 rounded-full text-sm inline-flex items-center gap-2">Live Demo <i data-lucide="external-link" class="h-3 w-3"></i></a>` : ''}
+        </div>
+    `;
     
-    <div class="flex gap-4 mt-6 flex-wrap">
-      ${data.github ? `<a href="${data.github}" target="_blank" class="primary-button px-5 py-2 rounded-full text-sm inline-flex items-center gap-2">GitHub <i data-lucide="external-link" class="h-3 w-3"></i></a>` : ''}
-      ${data.liveDemo ? `<a href="${data.liveDemo}" target="_blank" class="secondary-button px-5 py-2 rounded-full text-sm inline-flex items-center gap-2">Live Demo <i data-lucide="external-link" class="h-3 w-3"></i></a>` : ''}
-      ${data.youtube ? `<a href="${data.youtube}" target="_blank" class="secondary-button px-5 py-2 rounded-full text-sm inline-flex items-center gap-2">YouTube <i data-lucide="external-link" class="h-3 w-3"></i></a>` : ''}
-    </div>
-  `;
-  
-  // Re-initialize Lucide icons in modal
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-  }
-  
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
 
 // Helper function to prevent XSS
@@ -214,27 +428,191 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// ========== DYNAMIC HERO FROM LOCALSTORAGE ==========
+function loadHeroFromStorage() {
+    const saved = localStorage.getItem('portfolio_hero');
+    if (!saved) return;
+    
+    const hero = JSON.parse(saved);
+    
+    setTimeout(() => {
+        const nameElement = document.getElementById('heroName');
+        const titleElement = document.getElementById('heroTitle');
+        const descriptionElement = document.getElementById('heroDescription');
+        const taglineElement = document.querySelector('.glass.absolute .text-white');
+        
+        if (nameElement) nameElement.textContent = hero.name;
+        if (titleElement) titleElement.textContent = hero.title;
+        if (descriptionElement) descriptionElement.textContent = hero.description;
+        if (taglineElement) taglineElement.textContent = hero.tagline;
+    }, 200);
+}
+
+// ========== DYNAMIC SERVICES FROM LOCALSTORAGE ==========
+function generateServiceCard(service, index) {
+    const iconColorClass = index % 2 === 0
+        ? 'bg-[#A855F7]/15 text-[#A855F7]'
+        : 'bg-[#F472B6]/15 text-[#F472B6]';
+
+    return `
+        <article class="reveal visible service-card glass rounded-[2rem] p-7">
+            <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl ${iconColorClass}">
+                <i data-lucide="${escapeHtml(service.icon || 'code-2')}" class="h-7 w-7"></i>
+            </div>
+            <h3 class="text-xl font-bold">${escapeHtml(service.title || '')}</h3>
+            <p class="mt-4 leading-7 text-zinc-400">${escapeHtml(service.description || '')}</p>
+        </article>
+    `;
+}
+
+function loadServicesFromStorage() {
+    console.log('Entering loadServicesFromStorage');
+
+    const saved = localStorage.getItem('portfolio_services');
+    if (!saved) {
+        console.log('No services data found in localStorage');
+        return;
+    }
+    
+    const servicesData = JSON.parse(saved);
+    console.log('Loading services:', servicesData);
+
+    const servicesSection = document.getElementById('services');
+    if (!servicesSection) {
+        console.log('Services section not found yet');
+        return;
+    }
+
+    const sectionTitle = servicesSection.querySelector('h2');
+    const sectionSubtitle = servicesSection.querySelector('.max-w-2xl');
+    const servicesGrid = servicesSection.querySelector('.grid');
+    
+    console.log('Found section title:', sectionTitle);
+    console.log('Found section subtitle:', sectionSubtitle);
+    console.log('Found services grid:', servicesGrid);
+    
+    if (sectionTitle) sectionTitle.textContent = servicesData.sectionTitle || '';
+    if (sectionSubtitle) sectionSubtitle.textContent = servicesData.sectionSubtitle || '';
+    if (servicesGrid) {
+        servicesGrid.className = 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3';
+        servicesGrid.innerHTML = (servicesData.services || [])
+            .map((service, index) => generateServiceCard(service, index))
+            .join('');
+    }
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+// ========== DYNAMIC SKILLS FROM LOCALSTORAGE ==========
+function getSkillsFromStorage() {
+    const saved = localStorage.getItem('portfolio_skills');
+    if (saved) {
+        return JSON.parse(saved);
+    }
+    
+    const defaultSkills = [
+        { id: "skill_1", name: "HTML", icon: "code-2" },
+        { id: "skill_2", name: "CSS", icon: "palette" },
+        { id: "skill_3", name: "JavaScript", icon: "braces" },
+        { id: "skill_4", name: "Tailwind CSS", icon: "wind" },
+        { id: "skill_5", name: "Git/GitHub", icon: "git-branch" },
+        { id: "skill_6", name: "Java", icon: "coffee" },
+        { id: "skill_7", name: "Python", icon: "code-2" },
+        { id: "skill_8", name: "Flutter", icon: "smartphone" },
+        { id: "skill_9", name: "Figma", icon: "figma" }
+    ];
+    
+    localStorage.setItem('portfolio_skills', JSON.stringify(defaultSkills));
+    return defaultSkills;
+}
+
+function generateSkillPill(skill) {
+    return `
+        <span class="skill-pill inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-5 py-3 font-semibold text-white">
+            <i data-lucide="${escapeHtml(skill.icon || 'code-2')}" class="h-4 w-4 text-[#F472B6]"></i>
+            <span>${escapeHtml(skill.name || '')}</span>
+        </span>
+    `;
+}
+
+function loadSkillsFromStorage() {
+    const skills = getSkillsFromStorage();
+    const skillsSection = document.getElementById('skills');
+    if (!skillsSection) return;
+    
+    const skillsList = skillsSection.querySelector('[data-skills-list]');
+    if (!skillsList) return;
+    
+    skillsList.innerHTML = skills
+        .map(skill => generateSkillPill(skill))
+        .join('');
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+// ========== DYNAMIC CONTACT FROM LOCALSTORAGE ==========
+function getContactFromStorage() {
+    const saved = localStorage.getItem('portfolio_contact');
+    if (saved) {
+        return JSON.parse(saved);
+    }
+    
+    const defaultContact = {
+        email: "wmasha939@gmail.com",
+        github: "https://github.com/Masha-debug217",
+        linkedin: "https://www.linkedin.com/in/winnie-masha"
+    };
+    
+    localStorage.setItem('portfolio_contact', JSON.stringify(defaultContact));
+    return defaultContact;
+}
+
+function formatContactUrl(url) {
+    if (!url) return '';
+    return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+
+function loadContactFromStorage() {
+    const contact = getContactFromStorage();
+    const emailLink = document.querySelector('[data-contact-email]');
+    const emailText = document.querySelector('[data-contact-email-text]');
+    const githubLink = document.querySelector('[data-contact-github]');
+    const githubText = document.querySelector('[data-contact-github-text]');
+    const linkedinLink = document.querySelector('[data-contact-linkedin]');
+    const linkedinText = document.querySelector('[data-contact-linkedin-text]');
+    
+    if (emailLink) emailLink.href = `mailto:${contact.email || ''}`;
+    if (emailText) emailText.textContent = contact.email || '';
+    
+    if (githubLink) githubLink.href = contact.github || '#';
+    if (githubText) githubText.textContent = formatContactUrl(contact.github);
+    
+    if (linkedinLink) linkedinLink.href = contact.linkedin || '#';
+    if (linkedinText) linkedinText.textContent = formatContactUrl(contact.linkedin);
+}
+
 function attachModalTriggers() {
   document.querySelectorAll('[data-modal]').forEach(card => {
     if (card.dataset.modalReady === 'true') return;
     card.dataset.modalReady = 'true';
 
     card.addEventListener('click', (e) => {
-      // Don't trigger if clicking on a link inside the card
       if (e.target.tagName === 'A' || e.target.closest('a')) return;
-
       const modalId = card.getAttribute('data-modal');
       openModal(modalId);
     });
   });
 }
 
-// ========== THEME TOGGLE (LIGHT/DARK MODE) ==========
+// ========== THEME TOGGLE ==========
 function initThemeToggle() {
   const themeToggle = document.getElementById('theme-toggle');
   if (!themeToggle) return;
   
-  // Check for saved theme preference
   const savedTheme = localStorage.getItem('theme');
   const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
   
@@ -251,7 +629,6 @@ function initThemeToggle() {
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
     updateThemeIcon(isLight ? 'light' : 'dark');
     
-    // Recreate Lucide icons to update icon if needed
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
     }
@@ -275,7 +652,6 @@ function updateThemeIcon(theme) {
 
 // ========== INITIALIZE AFTER SECTIONS LOAD ==========
 function initializeAfterLoad() {
-  // Mobile menu toggle
   const menuToggle = document.getElementById('menuToggle');
   const mobileMenu = document.getElementById('mobileMenu');
   const mobileLinks = document.querySelectorAll('.mobile-link');
@@ -305,10 +681,7 @@ function initializeAfterLoad() {
     });
   }
   
-  // Reveal animations on scroll
-  const shell = document.getElementById('portfolio-shell');
   const revealItems = document.querySelectorAll('.reveal');
-  
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -320,7 +693,6 @@ function initializeAfterLoad() {
   
   revealItems.forEach((item) => revealObserver.observe(item));
   
-  // Active link highlighting
   const sections = document.querySelectorAll('main section[id]');
   const allNavLinks = document.querySelectorAll('.nav-link');
   const navbarHeight = 85;
@@ -353,7 +725,6 @@ function initializeAfterLoad() {
   window.addEventListener('scroll', updateActiveLink);
   updateActiveLink();
   
-  // Smooth anchor links with navbar offset
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
       const href = this.getAttribute('href');
@@ -371,30 +742,31 @@ function initializeAfterLoad() {
     });
   });
   
-  // Attach modal triggers to project cards
   attachModalTriggers();
   
-  // Initialize Lucide icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
   
-  // Dynamic year in footer
   const yearElement = document.getElementById('current-year');
   if (yearElement) {
     yearElement.textContent = new Date().getFullYear();
   }
   
-  // Console greeting
   console.log('🦋 Welcome to Winnie Macharia\'s portfolio!');
   console.log('✨ Pink butterfly with shimmering particles active');
   console.log('🎨 Light/Dark mode ready');
   console.log('📅 Loaded on:', new Date().toLocaleString());
+  
+  loadHeroFromStorage();
+  loadServicesFromStorage();
+  loadSkillsFromStorage();
+  loadContactFromStorage();
+  console.log('✅ Services loading attempted from initializeAfterLoad');
 }
 
-// ========== PINK BUTTERFLY WITH SHIMMERING PARTICLES ==========
+// ========== PINK BUTTERFLY ==========
 function initButterflyEffect() {
-  // Only run on devices with a mouse
   if (!window.matchMedia('(pointer: fine)').matches) return;
   
   const butterfly = document.createElement('div');
@@ -514,20 +886,12 @@ function initButterflyEffect() {
 }
 
 // ========== START THE APP ==========
-// Initialize modal system first
 initModalSystem();
-
-// Load all sections
 loadAllSections();
-
-// Initialize theme toggle
 initThemeToggle();
-
-// Initialize butterfly effect
 initButterflyEffect();
 
 // ========== FLOATING AI CHAT ==========
-
 async function askGemini(question) {
   try {
     const response = await fetch('/.netlify/functions/gemini-chat', {
@@ -549,7 +913,6 @@ async function askGemini(question) {
   }
 }
 
-// Initialize Floating Chat
 function initFloatingChat() {
   const chatButton = document.getElementById('chat-button');
   const chatWindow = document.getElementById('chat-window');
@@ -560,7 +923,6 @@ function initFloatingChat() {
   
   if (!chatButton || !chatWindow) return;
   
-  // Open chat
   chatButton.addEventListener('click', () => {
     chatWindow.classList.toggle('hidden');
     if (!chatWindow.classList.contains('hidden')) {
@@ -568,7 +930,6 @@ function initFloatingChat() {
     }
   });
   
-  // Close chat
   chatClose?.addEventListener('click', () => {
     chatWindow.classList.add('hidden');
   });
@@ -592,7 +953,6 @@ function initFloatingChat() {
     addMessage(question, true);
     chatInput.value = '';
     
-    // Typing indicator
     const typingDiv = document.createElement('div');
     typingDiv.className = 'flex justify-start';
     typingDiv.id = 'chat-typing';
@@ -616,7 +976,6 @@ function initFloatingChat() {
   });
 }
 
-// Initialize chat when page loads
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initFloatingChat);
 } else {

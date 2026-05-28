@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Admin Dashboard</title>
+    <meta name="robots" content="noindex, nofollow">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --paper: #F8F9FA;
+            --surface: #FFFFFF;
+            --text-primary: #1A1D20;
+            --text-secondary: #6C757D;
+            --border: #E9ECEF;
+            --primary: #2B579A;
+            --primary-hover: #244A84;
+            --success: #5CB85C;
+            --success-hover: #4EA34E;
+            --danger: #D9534F;
+            --danger-hover: #C94A46;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--paper);
+            color: var(--text-primary);
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus,
+        button:focus {
+            outline: 2px solid rgba(43, 87, 154, 0.22);
+            outline-offset: 2px;
+        }
+
+        .bg-gray-50 { background-color: var(--paper) !important; }
+        .bg-white { background-color: var(--surface) !important; }
+        .text-gray-900,
+        .text-gray-800,
+        .text-gray-700 { color: var(--text-primary) !important; }
+        .text-gray-600,
+        .text-gray-500,
+        .text-gray-400 { color: var(--text-secondary) !important; }
+        .border-gray-100,
+        .border-gray-200,
+        .border-gray-300 { border-color: var(--border) !important; }
+        .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border) !important; }
+        .bg-purple-600,
+        .bg-blue-500 { background-color: var(--primary) !important; }
+        .hover\:bg-purple-700:hover,
+        .hover\:bg-blue-600:hover { background-color: var(--primary-hover) !important; }
+        .bg-green-500,
+        .bg-green-600 { background-color: var(--success) !important; }
+        .hover\:bg-green-600:hover,
+        .hover\:bg-green-700:hover { background-color: var(--success-hover) !important; }
+        .bg-red-500 { background-color: var(--danger) !important; }
+        .hover\:bg-red-600:hover { background-color: var(--danger-hover) !important; }
+        .text-red-500 { color: var(--danger) !important; }
+        .text-purple-600 { color: var(--primary) !important; }
+        .shadow-md,
+        .shadow-sm,
+        .hover\:shadow-sm:hover { box-shadow: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Login Section -->
+    <div id="loginSection" class="min-h-screen flex items-center justify-center bg-gray-50">
+        <div class="bg-white p-8 rounded-lg border border-gray-200 w-96">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">Portfolio Admin</h2>
+                <p class="text-gray-500 text-sm mt-1">Enter password to continue</p>
+            </div>
+            
+            <input type="password" id="adminPassword"
+                   placeholder="Enter password"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md mb-3">
+            
+            <button onclick="login()"
+                    class="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700">
+                Login
+            </button>
+            
+            <p id="errorMsg" class="text-red-500 text-sm mt-3 text-center hidden">
+                Wrong password!
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="hidden">
+        <!-- Header -->
+        <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-semibold text-gray-800">Portfolio Dashboard</h1>
+                        
+                    </div>
+                    <button onclick="logout()"
+                            class="bg-red-500 text-white px-4 py-2 rounded-md text-sm hover:bg-red-600">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            
+            <!-- Hero Content Editor -->
+            <div class="bg-white rounded-md border border-gray-200 mb-8">
+                <div class="border-b border-gray-200 px-6 py-3">
+                    <h2 class="font-semibold text-gray-800">Edit Hero Section</h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                            <input type="text" id="heroName"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Title / Role</label>
+                            <input type="text" id="heroTitle"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
+                            <input type="text" id="heroTagline"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description / Bio</label>
+                            <textarea id="heroDescription" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button onclick="saveHeroContent()"
+                                    class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+                                Save Hero Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Content Editor -->
+            <div class="bg-white rounded-md border border-gray-200 mb-8">
+                <div class="border-b border-gray-200 px-6 py-3 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-semibold text-gray-800">Edit Services Section</h2>
+                    </div>
+                    <button onclick="addNewService()" class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-green-600">
+                        Add New Service
+                    </button>
+                </div>
+                <div class="p-6">
+                    <!-- Section Header -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
+                        <h3 class="font-medium text-gray-700 mb-3">Section Header</h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
+                                <input type="text" id="servicesSectionTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Section Subtitle</label>
+                                <input type="text" id="servicesSectionSubtitle" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Services List Container -->
+                    <div id="servicesListContainer" class="space-y-4">
+                        <!-- Services will be dynamically loaded here -->
+                    </div>
+                    
+                    <div class="flex justify-end mt-4">
+                        <button onclick="saveServicesContent()" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                            Save All Services Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Content Editor -->
+            <div class="bg-white rounded-md border border-gray-200 mb-8">
+                <div class="border-b border-gray-200 px-6 py-3 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-semibold text-gray-800">Edit Skills Section</h2>
+                    </div>
+                    <button onclick="addNewSkill()" class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-green-600">
+                        + Add New Skill
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div id="skillsListContainer" class="space-y-4">
+                        <!-- Skills will be dynamically loaded here -->
+                    </div>
+                    
+                    <div class="flex justify-end mt-4">
+                        <button onclick="saveSkillsContent()" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                            Save All Skills Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Content Editor -->
+            <div class="bg-white rounded-md border border-gray-200 mb-8">
+                <div class="border-b border-gray-200 px-6 py-3">
+                    <h2 class="font-semibold text-gray-800">Edit Contact Section</h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                            <input type="email" id="contactEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">GitHub URL</label>
+                            <input type="url" id="contactGithub" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">LinkedIn URL</label>
+                            <input type="url" id="contactLinkedin" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div class="flex justify-end">
+                            <button onclick="saveContactContent()" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                                Save Contact Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-md border border-gray-200">
+                    <div class="text-gray-500 text-sm">Total Projects</div>
+                    <div class="text-3xl font-semibold text-gray-800" id="totalProjects">0</div>
+                </div>
+                <div class="bg-white p-4 rounded-md border border-gray-200">
+                    <div class="text-gray-500 text-sm">Total Clicks</div>
+                    <div class="text-3xl font-semibold text-gray-800" id="totalClicks">0</div>
+                </div>
+                <div class="bg-white p-4 rounded-md border border-gray-200">
+                    <div class="text-gray-500 text-sm">Last Updated</div>
+                    <div class="text-sm font-medium text-gray-800 mt-2" id="lastUpdated">Never</div>
+                </div>
+            </div>
+
+            <!-- Project Analytics -->
+            <div class="bg-white rounded-md border border-gray-200 mb-8">
+                <div class="border-b border-gray-200 px-6 py-3">
+                    <h2 class="font-semibold text-gray-800">Project Click Analytics</h2>
+                </div>
+                <div id="analyticsContainer" class="p-6">
+                    <div class="text-gray-500 text-sm">No click data yet.</div>
+                </div>
+            </div>
+            
+            <!-- Add New Project Form -->
+            <div class="bg-white rounded-md border border-gray-200 mb-8">
+                <div class="border-b border-gray-200 px-6 py-3">
+                    <h2 class="font-semibold text-gray-800">Add New Project</h2>
+                </div>
+                <div class="p-6">
+                    <form id="projectForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Project Title *</label>
+                                <input type="text" id="title" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                                <input type="url" id="imageUrl"
+                                       placeholder="https://..."
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                                <textarea id="description" rows="3" required
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Project Link</label>
+                                <input type="url" id="projectLink"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">GitHub Link</label>
+                                <input type="url" id="githubLink"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Technologies (comma separated)</label>
+                                <input type="text" id="technologies"
+                                       placeholder="React, Tailwind, Firebase"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit"
+                                    class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700">
+                                Add Project
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Projects List -->
+            <div class="bg-white rounded-md border border-gray-200">
+                <div class="border-b border-gray-200 px-6 py-3">
+                    <h2 class="font-semibold text-gray-800">Projects</h2>
+                </div>
+                <div id="projectsContainer" class="divide-y divide-gray-200">
+                    <div class="p-6 text-center text-gray-500">
+                        Loading projects...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
